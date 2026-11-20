@@ -1,4 +1,5 @@
 import sys
+from collections.abc import Iterable
 
 import pygame
 
@@ -24,14 +25,14 @@ def main():
 
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
-    asteroids = pygame.sprite.Group()
+    asteroids: pygame.sprite.Group[Asteroid] = pygame.sprite.Group()
 
     Asteroid.containers = (updatable, drawable, asteroids)
     AsteroidField.containers = updatable
 
     asteroidField = AsteroidField()
 
-    shots = pygame.sprite.Group()
+    shots: pygame.sprite.Group[Shot] = pygame.sprite.Group()
     Shot.containers = (updatable, drawable, shots)
 
     # running = True
@@ -46,6 +47,10 @@ def main():
             sprite.update(dt)
 
         for asteroid in asteroids:
+            for shot in shots:
+                if shot.collides_with(asteroid):
+                    log_event("asteroid_shot")
+                    asteroid.kill()
             if asteroid.collides_with(player):
                 log_event("player_hit")
                 print("Game over!")
